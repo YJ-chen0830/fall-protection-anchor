@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高處作業墜落防護錨點荷重計算 | Fall Protection Anchor Load Check</title>
+<script src="https://yj-chen0830.github.io/jrh-core/jrh-core.js?v=3" defer></script>
+<style>
+  :root{--navy:#0b1f3a;--navy2:#13284a;--gold:#c9a14a;--gold2:#e0bf6e;--bg:#f5f3ee;--ink:#1c2530;--line:#d8d2c2;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Noto Sans TC","Segoe UI",sans-serif;background:var(--bg);color:var(--ink);}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#f5f3ee;padding:28px 32px;}
+  header h1{margin:0;font-size:22px;}
+  header span{color:var(--gold2);font-size:13px;display:block;margin-top:4px;}
+  main{max-width:1060px;margin:0 auto;padding:28px 20px 60px;}
+  .grid{display:grid;grid-template-columns:340px 1fr;gap:24px;}
+  @media(max-width:820px){.grid{grid-template-columns:1fr;}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px 24px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .card h2{font-size:14.5px;margin:0 0 18px;color:var(--navy);font-weight:700;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--gold);padding-bottom:10px;}
+  label{display:block;font-size:12px;color:#666;margin:10px 0 4px;font-weight:500;}
+  input,select{width:100%;padding:8px 11px;border:1.5px solid var(--line);border-radius:7px;font-size:13.5px;background:#fafaf8;}
+  input:focus,select:focus{outline:none;border-color:var(--gold);}
+  .sec{font-size:12px;font-weight:700;color:var(--navy);margin:16px 0 6px;border-left:4px solid var(--gold);padding-left:9px;letter-spacing:.04em;text-transform:uppercase;}
+  .note{font-size:11.5px;color:#666;margin-top:12px;line-height:1.75;background:#f9f7f2;border-radius:6px;padding:9px 12px;}
+  button.calc-btn{margin-top:16px;width:100%;padding:12px;border:none;border-radius:8px;background:var(--navy);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;}
+  button.calc-btn:hover{background:var(--navy2);}
+  button.pro-btn{margin-top:12px;width:100%;padding:12px;border:none;border-radius:8px;background:var(--gold);color:var(--navy);font-size:14.5px;font-weight:700;cursor:pointer;}
+  button.pro-btn:hover{filter:brightness(1.08);}
+  table{width:100%;border-collapse:collapse;margin-top:10px;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  th{background:var(--navy);color:#f5f3ee;font-weight:600;font-size:12px;padding:9px 10px;text-align:left;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--line);}
+  tr:nth-child(even) td{background:#f9f7f3;}
+  td:last-child{text-align:right;font-weight:700;}
+  .ok{color:#1a7d3a;font-weight:700;}
+  .ng{color:#c0392b;font-weight:700;}
+  details.proc{margin-top:16px;border:1px solid var(--line);border-radius:8px;background:#fafaf8;overflow:hidden;}
+  details.proc summary{cursor:pointer;padding:10px 14px;font-weight:700;font-size:13px;color:var(--navy);user-select:none;list-style:none;display:flex;align-items:center;gap:6px;}
+  details.proc summary::before{content:"▶";font-size:10px;transition:transform .2s;}
+  details[open].proc summary::before{transform:rotate(90deg);}
+  details.proc pre{margin:0;padding:12px 16px 16px;font-family:"Courier New",monospace;font-size:11.5px;line-height:1.9;white-space:pre-wrap;color:#2c3e50;border-top:1px solid var(--line);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .proj-section{background:#fff;border:1px solid var(--gold);border-radius:10px;padding:18px 22px;margin-bottom:20px;}
+  .proj-section h3{margin:0 0 12px;color:var(--navy);font-size:14px;font-weight:700;}
+  .proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:600px){.proj-grid{grid-template-columns:1fr;}.row2{grid-template-columns:1fr;}}
+  .mob-tabs{display:none;}
+  @media screen and (max-width:767px){
+    .mob-tabs{display:flex;background:var(--bg);border-bottom:2px solid var(--line);margin:0 -20px 0;padding:0 20px;}
+    .mob-tab{flex:1;padding:11px 4px;text-align:center;font-size:13.5px;font-weight:700;color:#888;cursor:pointer;background:transparent;border:none;border-bottom:3px solid transparent;}
+    .mob-tab.active{color:var(--navy);border-bottom-color:var(--gold);}
+    .grid{display:block;}
+    .grid>.card{display:none;}
+    .grid>.card.mob-active{display:block;}
+  }
+  @media print{
+    header,.no-print{display:none!important;}
+    body{background:#fff;margin:0;font-size:9pt;line-height:1.5;color:#111;}
+    main{padding:0;max-width:100%!important;}
+    .grid{grid-template-columns:1fr!important;gap:10pt!important;}
+    .card{box-shadow:none!important;border:1px solid #ccc!important;border-radius:4pt!important;padding:10pt 12pt!important;break-inside:avoid;}
+    .card h2{font-size:10.5pt!important;padding-bottom:6pt!important;margin-bottom:9pt!important;}
+    label{font-size:8pt!important;margin:6pt 0 2pt!important;}
+    .sec{font-size:8pt!important;margin:10pt 0 4pt!important;}
+    .note{font-size:7.5pt!important;padding:6pt 9pt!important;}
+    table{border:1px solid #bbb!important;border-radius:0!important;margin-top:6pt!important;}
+    th{font-size:8pt!important;padding:5pt 7pt!important;background:#0b1f3a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    td{font-size:8.5pt!important;padding:5pt 7pt!important;}
+    tr:nth-child(even) td{background:#f5f5f5!important;}
+    details.proc{display:block!important;margin-top:10pt!important;border:1pt solid #0b1f3a!important;border-radius:4pt!important;break-inside:avoid;background:#f9f9f6!important;}
+    details.proc>summary{display:none!important;}
+    details.proc::before{content:"📋  計算過程（供第三方檢核）";display:block;font-weight:700;font-size:8pt;color:#0b1f3a;padding:6pt 10pt 4pt;border-bottom:1px solid #ccc;letter-spacing:.04em;}
+    details.proc>pre{font-size:7pt!important;line-height:1.65!important;white-space:pre-wrap!important;padding:6pt 10pt 10pt!important;color:#1a1a1a!important;font-family:"Courier New",monospace!important;}
+    .proj-section{border:1.5pt solid #0b1f3a!important;border-radius:4pt!important;}
+    button.pro-btn,button.calc-btn{display:none!important;}
+    @page{margin:15mm 12mm;size:A4;}
+  }
+</style>
+</head>
+<body data-tool="fpa">
+<header>
+  <a href="https://yj-chen0830.github.io/engineering-hub/" style="color:var(--gold2);font-size:12.5px;text-decoration:none;display:inline-block;margin-bottom:8px;">← 返回工程計算中心</a>
+  <h1>🪢 高處作業墜落防護錨點荷重計算</h1>
+  <span>ANSI Z359.1 / OSHA 1926.502 精神之簡化能量法 | 個人防墜設備錨點設計檢核</span>
+</header>
+<main>
+
+<div class="proj-section no-print" id="projSection">
+  <h3>📁 專案資訊（列印時帶入計算書封面）</h3>
+  <div class="proj-grid">
+    <div><label>工程名稱</label><input id="pj-name" placeholder="○○工程"></div>
+    <div><label>工程地點</label><input id="pj-loc" placeholder="○○市○○區"></div>
+    <div><label>承造廠商</label><input id="pj-contractor" placeholder="○○營造股份有限公司"></div>
+    <div><label>文件編號</label><input id="pj-docno" placeholder="FPA-CAL-001"></div>
+    <div><label>計算者</label><input id="pj-calc" placeholder="姓名"></div>
+    <div><label>審核者</label><input id="pj-review" placeholder="姓名"></div>
+    <div><label>計算日期</label><input id="pj-date" type="date"></div>
+  </div>
+</div>
+
+<div class="mob-tabs">
+  <button class="mob-tab active" onclick="switchMobTab('fpa-in',this)">📋 輸入參數</button>
+  <button class="mob-tab" id="mobTab-fpa-r" onclick="switchMobTab('fpa-r',this)">📊 計算結果</button>
+</div>
+
+<div class="grid">
+  <div class="card mob-active" data-tab="fpa-in">
+    <h2>防墜系統輸入參數</h2>
+    <div class="row2">
+      <div><label>作業者體重 W (kg，含工具裝備)</label><input id="fpa-W" type="number" value="100" step="1" min="1"></div>
+      <div><label>自由落下距離 FF (m)</label><input id="fpa-FF" type="number" value="1.2" step="0.1" min="0"></div>
+    </div>
+    <div class="row2">
+      <div><label>制動距離 DD (m)</label><input id="fpa-DD" type="number" value="1.0" step="0.1" min="0.1"></div>
+      <div><label>容許最大制動力 MAF_allow (kN)</label><input id="fpa-MAF" type="number" value="8" step="0.1" min="0.1"></div>
+    </div>
+    <div class="row2">
+      <div><label>錨點動態放大係數</label><input id="fpa-DAF" type="number" value="2.0" step="0.1" min="1"></div>
+      <div><label>規範最低錨點強度需求 (kN)</label><input id="fpa-MinAnchor" type="number" value="22.2" step="0.1" min="0"></div>
+    </div>
+
+    <div class="sec">預設範例</div>
+    <div class="note">
+      預設值：W=100 kg、FF=1.2 m、DD=1.0 m、MAF_allow=8.0 kN、動態放大係數=2.0、最低錨點強度=22.2 kN。<br>
+      規範實務上通常要求自由落下距離不宜超過 1.8 m；若計算結果超出容許最大制動力，應優先縮短自由落下距離，或選用制動力較低之緩衝器/防墜器。
+    </div>
+
+    <button class="calc-btn" onclick="calcFPA()">計算錨點設計荷重</button>
+    <div class="note">
+      本工具採簡化能量守恆法，以平均制動力估算個人防墜落系統之錨點需求，供高處作業初步設計檢核使用。未考慮繩索非線性彈性、人體生物力學反應、連接件變形、擺盪墜落（swing fall）、結構二次受力與多人體共用錨點情境，正式設計仍應依實際產品型錄、現場作業計畫與合格專業人員審查結果辦理。
+    </div>
+  </div>
+
+  <div class="card" data-tab="fpa-r">
+    <h2>錨點檢核結果</h2>
+    <div id="fpa-result"><p style="color:#888">尚未計算</p></div>
+    <details class="proc" id="fpa-proc" style="display:none">
+      <summary>📋 計算過程（供第三方檢核）</summary>
+      <pre id="fpa-proc-text"></pre>
+    </details>
+    <button class="pro-btn no-print" onclick="openPro()">📄 產出計算書 PDF</button>
+  </div>
+</div>
+
+</main>
+<script>
+function switchMobTab(name,btn){
+  btn.parentElement.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  btn.parentElement.nextElementSibling.querySelectorAll('.card').forEach(function(c){
+    c.classList.toggle('mob-active',c.dataset.tab===name);
+  });
+}
+function openPro(){ JRH.checkEmail(function(){ jrhPrint('高處作業墜落防護錨點荷重計算書'); }); }
+function v(id){return parseFloat(document.getElementById(id).value)||0;}
+function f1(x){return x.toFixed(1);}
+function f2(x){return x.toFixed(2);}
+function f3(x){return x.toFixed(3);}
+
+function calcFPA(){
+  var W=v('fpa-W');
+  var FF=v('fpa-FF');
+  var DD=v('fpa-DD');
+  var MAF=v('fpa-MAF');
+  var DAF=v('fpa-DAF');
+  var minAnchor=v('fpa-MinAnchor');
+  var g=9.81;
+
+  var Favg=W*g*(FF+DD)/(DD*1000);
+  var arrestOK=Favg<=MAF;
+  var dynLoad=Favg*DAF;
+  var finalBasis=Math.max(dynLoad,minAnchor);
+  var basisSource=dynLoad>=minAnchor?'取自計算之錨點動態設計荷重':'取自規範最低錨點強度需求';
+
+  var res=document.getElementById('fpa-result');
+  res.innerHTML=
+    '<table><tr><th>項目</th><th>數值</th></tr>'+
+    '<tr><td>平均制動力 F_avg</td><td>'+f2(Favg)+' kN '+(arrestOK?'<span class="ok">OK</span>':'<span class="ng">NG</span>')+'</td></tr>'+
+    '<tr><td>容許最大制動力 MAF_allow</td><td>'+f2(MAF)+' kN</td></tr>'+
+    '<tr><td>錨點動態設計荷重</td><td>'+f2(dynLoad)+' kN</td></tr>'+
+    '<tr><td>規範最低錨點強度需求</td><td>'+f2(minAnchor)+' kN</td></tr>'+
+    '<tr><td>錨點最終設計依據</td><td>'+f2(finalBasis)+' kN</td></tr>'+
+    '<tr><td>設計依據來源</td><td>'+basisSource+'</td></tr>'+
+    '<tr><td>改善建議</td><td>'+(arrestOK?'目前制動力符合容許值。':'需縮短自由落下距離或更換制動力較低之緩衝器。')+'</td></tr>'+
+    '</table>';
+
+  var p='';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  p+='  高處作業墜落防護錨點荷重計算過程（簡化能量法）\n';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  p+='【輸入】\n';
+  p+='  作業者體重 W = '+W+' kg\n';
+  p+='  自由落下距離 FF = '+FF+' m\n';
+  p+='  制動距離 DD = '+DD+' m\n';
+  p+='  容許最大制動力 MAF_allow = '+MAF+' kN\n';
+  p+='  錨點動態放大係數 = '+DAF+'\n';
+  p+='  規範最低錨點強度需求 = '+minAnchor+' kN\n';
+  p+='  重力加速度 g = '+g+' m/s²\n\n';
+  p+='【一】平均制動力計算\n';
+  p+='  F_avg = W × g × (FF + DD) / (DD × 1000)\n';
+  p+='        = '+W+' × '+g+' × ('+FF+' + '+DD+') / ('+DD+' × 1000)\n';
+  p+='        = '+f3(Favg)+' kN\n';
+  p+='  判定：F_avg '+(arrestOK?'≤':'＞')+' MAF_allow → '+f3(Favg)+' '+(arrestOK?'≤':'＞')+' '+f3(MAF)+' kN → '+(arrestOK?'OK':'NG')+'\n';
+  if(!arrestOK){
+    p+='  建議：需縮短自由落下距離或更換制動力較低之緩衝器。\n';
+  }
+  p+='\n【二】錨點設計荷重\n';
+  p+='  錨點動態設計荷重 = F_avg × 動態放大係數\n';
+  p+='                   = '+f3(Favg)+' × '+f3(DAF)+'\n';
+  p+='                   = '+f3(dynLoad)+' kN\n\n';
+  p+='【三】錨點最終設計依據\n';
+  p+='  錨點最終設計依據 = max(錨點動態設計荷重, 規範最低錨點強度需求)\n';
+  p+='                   = max('+f3(dynLoad)+', '+f3(minAnchor)+')\n';
+  p+='                   = '+f3(finalBasis)+' kN\n';
+  p+='  採用來源：'+basisSource+'\n\n';
+  p+='【四】補充說明\n';
+  p+='  1. 本工具採 ANSI Z359.1 / OSHA 1926.502 設計精神之簡化能量法。\n';
+  p+='  2. 未考慮繩索非線性彈性特性、擺盪墜落（swing fall）效應、連接件變形及人體動力反應。\n';
+  p+='  3. 如為水平生命線、多人體共用錨點、邊緣墜落或特殊構件，應另作專案設計檢討。\n';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+
+  document.getElementById('fpa-proc-text').textContent=p;
+  document.getElementById('fpa-proc').style.display='';
+  if(window.innerWidth<768){
+    var b=document.getElementById('mobTab-fpa-r');
+    if(b)switchMobTab('fpa-r',b);
+  }
+}
+
+calcFPA();
+</script>
+<script>
+window.jrhDocMeta={
+  "doc":"高處作業墜落防護錨點荷重計算書",
+  "codes":[
+    "ANSI/ASSP Z359.1 Fall Protection Code 設計精神",
+    "OSHA 1926.502 Personal Fall Arrest Systems 錨點強度要求（5,000 lb 約 22.2 kN）",
+    "能量守恆法之個人防墜系統平均制動力簡化估算"
+  ],
+  "notes":[
+    "本工具供高處作業個人防墜設備錨點初步設計檢核使用，採簡化能量法估算平均制動力。",
+    "計算未納入繩索非線性彈性、緩衝器實際力-位移曲線、擺盪墜落、邊緣效應、人體反應與結構局部變形，正式設計應依產品型錄與專業人員檢核。",
+    "若平均制動力超出容許最大制動力，應優先縮短自由落下距離，或更換制動力較低之合格緩衝器/防墜器。",
+    "錨點最終設計依據取計算動態荷重與規範最低錨點強度需求兩者較大值；實際構件承載能力、錨栓設計及基材破壞模式應另行驗算。",
+    "本工具不適用於多人體共用錨點、水平生命線、特殊構架、救援荷重與其他需進階動力分析之情境。"
+  ]
+};
+</script>
+</body>
+</html>
